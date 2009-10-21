@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using nLess;
@@ -17,11 +17,9 @@ namespace ObjectSpike
             builder.Append(new string(' ', indent));
             builder.AppendLine(root.id_.ToEnLess().ToString());
 
-            var cursor = root.child_;
-            while (cursor != null)
+            foreach(var cursor in root.AsEnumerable())
             {
                 builder.Append(PrintTree(cursor, indent + 1));
-                cursor = cursor.next_;
             }
             return builder.ToString();
         }
@@ -30,21 +28,19 @@ namespace ObjectSpike
         {
             var document = new LessDocument();
 
-            var nextNode = node.child_.child_;
-
             // assumption: Root will ALWAYS contain only 'primary' nodes.
-            while (nextNode != null)
+            foreach(var childNode in node.child_.AsEnumerable())
             {
-                switch (nextNode.id_.ToEnLess())
+                switch (childNode.id_.ToEnLess())
                 {
                     case EnLess.ruleset:
-                        var ruleset = ToRule(nextNode.child_);
+                        var ruleset = ToRule(childNode.child_);
                         document.Rules.AddRange(ruleset);
                         break;
                     default:
+                        System.Console.WriteLine(childNode.id_.ToEnLess());
                         break;
                 }
-                nextNode = nextNode.next_;
             }
 
             return document;
@@ -54,24 +50,16 @@ namespace ObjectSpike
         {
             var rule = new LessRule();
             var selectors = new List<LessSelector>();
-            var nextNode = node.child_;
-            while (nextNode != null)
+            foreach(var childNode in node.AsEnumerable())
             {
-                switch (nextNode.id_.ToEnLess())
+                switch (childNode.id_.ToEnLess())
                 {
                     case EnLess.selectors:
-                        var selectorNode = nextNode.child_;
-                        while(selectorNode != null)
-                        {
-                            selectors.Add(ToSelectors(selectorNode));
-                            selectorNode = selectorNode.next_;
-                        }
+                        selectors.AddRange(childNode.AsEnumerable().Select(x => ToSelectors(x)));
                         break;
 
                     case EnLess.primary:
-                        {
-                        var cursor = nextNode.child_;
-                        while (cursor != null)
+                        foreach(var cursor in childNode.AsEnumerable())
                         {
                             switch(cursor.id_.ToEnLess())
                             {
@@ -84,22 +72,21 @@ namespace ObjectSpike
                                     rule.Properties.Add(prop);
                                     break;
                                 default:
+                                    System.Console.WriteLine(cursor.id_.ToEnLess());
                                     break;
 
                             }
-                            cursor = cursor.next_;
                         }
                         break;
-                        }
 
                     default:
+                        Debug.WriteLine(childNode.id_.ToEnLess());
                         break;
                 }
-                nextNode = nextNode.next_;
             }
             foreach(var selector in selectors)
             {
-                var r = rule.Clone() as LessRule;
+                var r = (LessRule)rule.Clone();
                 r.Selectors.Add(selector);
                 yield return r;
             }
@@ -108,8 +95,7 @@ namespace ObjectSpike
         private LessProperty ToProperty(PegNode node)
         {
             var property = new LessProperty();
-            var cursor = node.child_;
-            while(cursor != null)
+            foreach(var cursor in node.AsEnumerable())
             {
                 switch(cursor.id_.ToEnLess())
                 {
@@ -120,7 +106,6 @@ namespace ObjectSpike
                         property.Value = cursor.GetAsString(Src);
                         break;
                 }
-                cursor = cursor.next_;
             }
             return property;
         }

@@ -55,6 +55,13 @@
     <Compile Include="LessRule.cs" />
     <Compile Include="LessSelector.cs" />
     <Compile Include="Loader.cs" />
+    <Compile Include="NodeEnumerator.cs" />
+    <Compile Include="Operations\FlattenDocumentOperation.cs" />
+    <Compile Include="Operations\GroupByPropertyOperation.cs" />
+    <Compile Include="Operations\GroupBySelectorOperation.cs" />
+    <Compile Include="Operations\IDocumentOperation.cs" />
+    <Compile Include="Operations\RemoveDuplicatePropertiesOperation.cs" />
+    <Compile Include="Operations\RemoveEmptyRulesOperation.cs" />
     <Compile Include="parser\C#\nLess.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

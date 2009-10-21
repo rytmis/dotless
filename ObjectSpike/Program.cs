@@ -1,37 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using ObjectSpike.Operations;
 
 namespace ObjectSpike
 {
     class Program
     {
-        static string src = @"
-#first > .second {
-    font-size: 2em;
-}
-#first > .second, #second {
-    color: black;
-}
-";
+        static readonly IDocumentOperation[] Operations = new IDocumentOperation[] {
+                                                                      new FlattenDocumentOperation(),
+                                                                      //new GroupBySelectorOperation(),
+                                                                      //new GroupByPropertyOperation(),
+                                                                      new RemoveDuplicatePropertiesOperation(),
+                                                                      new RemoveEmptyRulesOperation(),
+                                                                      new AutoFixIEOperation(),
+                                                                  };
         static void Main(string[] args)
         {
-            var less = src; 
+            var less = File.ReadAllText(@"..\..\..\nLess.Test\Spec\less\rulesets.less");
             var parser = new nLess.nLess(less, Console.Out);
             parser.Parse();
             var root = parser.GetRoot();
-            //PrintTree(root, 0);
-            var loader = new Loader {Src = src};
+            var loader = new Loader {Src = less};
             var doc = loader.ToDocument(root);
-            var grouped = doc.Rules.GroupBy(x => x.GetSelectors());
-            foreach(var g in grouped)
+
+            foreach(var operation in Operations)
             {
-                var properties = from r in g
-                                 from prop in r.Properties
-                                 select prop;
-                var rule = new LessRule {Properties = properties.ToList(), Selectors = new List<LessSelector> {new LessSelector { Name = g.Key}}};
-                Console.Write(rule.ToCss());
+                doc = operation.Execute(doc);
             }
+            Console.WriteLine(doc.ToCss());
         }
     }
 }
