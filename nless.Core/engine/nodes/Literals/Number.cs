@@ -46,10 +46,7 @@ namespace nless.Core.engine
         {
             return string.Format("{0}{1}",FormatValue(), Unit ?? "");
         }
-      //TODO: Dont get this
-      //def to_css
-      //  "#{(self % 1).zero?? "#{self.to_i}#@unit" : self}"
-      //end
+
 
         #region operator overrides
         public static Number operator +(Number number1, Number number2)

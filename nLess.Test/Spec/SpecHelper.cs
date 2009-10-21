@@ -1,16 +1,15 @@
-﻿using System;
-using System.IO;
-using nless.Core.engine;
-using NUnit.Framework;
-
-namespace nLess.Test.Spec
+﻿namespace nLess.Test.Spec
 {
+    using System.IO;
+    using nless.Core.engine;
+    using NUnit.Framework;
+
     public class SpecHelper
     {
         public static string Lessify(string fileName)
         {
             var file = Path.Combine("Spec/less", fileName + ".less");
-            return new Engine(File.ReadAllText(file)).Parse().Css;
+            return new Engine(File.ReadAllText(file)).Parse().Css.Replace("\r\n", "\n");
         }
         public static string Css(string fileName)
         {
@@ -21,7 +20,7 @@ namespace nLess.Test.Spec
         public static void ShouldEqual(string filename)
         {
             var less = Lessify(filename);
-            Console.WriteLine(less);
+            //Console.WriteLine(less);
             var css = Css(filename);
             css.ShouldEqual(less, string.Format("|{0}| != |{1}|", less, css));
         }
