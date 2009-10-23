@@ -8,11 +8,11 @@ namespace ObjectSpike
     {
         static readonly IDocumentOperation[] Operations = new IDocumentOperation[] {
                                                                       new FlattenDocumentOperation(),
-                                                                      //new GroupBySelectorOperation(),
-                                                                      //new GroupByPropertyOperation(),
+                                                                      new GroupBySelectorOperation(),
+                                                                      new GroupByPropertyOperation(),
                                                                       new RemoveDuplicatePropertiesOperation(),
                                                                       new RemoveEmptyRulesOperation(),
-                                                                      new AutoFixIEOperation(),
+                                                                     // new AutoFixIEOperation(),
                                                                   };
         static void Main(string[] args)
         {

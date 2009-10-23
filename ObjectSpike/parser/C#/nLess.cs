@@ -1,4 +1,4 @@
-/* created on 13/10/2009 00:12:13 from peg generator V1.0 using '' as input*/
+/* created on 23-10-2009 16:30:33 from peg generator V1.0 using '' as input*/
 
 using Peg.Base;
 using System;
@@ -70,12 +70,11 @@ namespace nLess
 
            return TreeAST((int)EnLess.Parse,()=> primary() );
 		}
-        public bool primary()    /*^^primary: (import / declaration / ruleset / comment)* ;*/
+        public bool primary()    /*primary: (import / declaration / ruleset / comment)* ;*/
         {
 
-           return TreeNT((int)EnLess.primary,()=>
-                OptRepeat(()=>  
-                      import() || declaration() || ruleset() || comment() ) );
+           return OptRepeat(()=>  
+                      import() || declaration() || ruleset() || comment() );
 		}
         public bool import()    /*^^import :  ws '@import'  S import_url medias? s (';'/FATAL<"Semi colon expected">) ;*/
         {
@@ -146,11 +145,10 @@ namespace nLess
                       && OneOf("\n")
                       && ws() ) );
 		}
-        public bool declaration()    /*^^declaration:  standard_declaration / catchall_declaration ;*/
+        public bool declaration()    /*declaration:  standard_declaration / catchall_declaration ;*/
         {
 
-           return TreeNT((int)EnLess.declaration,()=>
-                    standard_declaration() || catchall_declaration() );
+           return     standard_declaration() || catchall_declaration();
 		}
         public bool standard_declaration()    /*^^standard_declaration: ws (ident / variable)  s ':' s expressions  s (';'/ ws &'}') ws ;*/
         {
@@ -255,10 +253,10 @@ namespace nLess
                      And(()=>    S() && OneOf("-+*/") && S() )
                   || OneOf("-+*/") );
 		}
-        public bool ruleset()    /*^^ruleset : standard_ruleset / mixin_ruleset;*/
+        public bool ruleset()    /*^ruleset : standard_ruleset / mixin_ruleset;*/
         {
 
-           return TreeNT((int)EnLess.ruleset,()=>
+           return TreeAST((int)EnLess.ruleset,()=>
                     standard_ruleset() || mixin_ruleset() );
 		}
         public bool standard_ruleset()    /*^^standard_ruleset: ws selectors [{] ws primary ws [}] ws;*/
@@ -281,16 +279,15 @@ namespace nLess
            return TreeNT((int)EnLess.mixin_ruleset,()=>
                 And(()=>    ws() && selectors() && Char(';') && ws() ) );
 		}
-        public bool selectors()    /*^^selectors :  ws selector (s ',' ws selector)* ws ;*/
+        public bool selectors()    /*selectors :  ws selector (s ',' ws selector)* ws ;*/
         {
 
-           return TreeNT((int)EnLess.selectors,()=>
-                And(()=>  
+           return And(()=>  
                      ws()
                   && selector()
                   && OptRepeat(()=>    
                       And(()=>    s() && Char(',') && ws() && selector() ) )
-                  && ws() ) );
+                  && ws() );
 		}
         public bool selector()    /*^^selector : (s select element s)+ arguments? ;*/
         {
@@ -350,10 +347,10 @@ namespace nLess
                   || Char('@','m','e','d','i','a')
                   || Char("@font-face") );
 		}
-        public bool class_id()    /*^^class_id : tag? (class / id)+;*/
+        public bool class_id()    /*^class_id : tag? (class / id)+;*/
         {
 
-           return TreeNT((int)EnLess.class_id,()=>
+           return TreeAST((int)EnLess.class_id,()=>
                 And(()=>  
                      Option(()=> tag() )
                   && PlusRepeat(()=>     @class() || id() ) ) );

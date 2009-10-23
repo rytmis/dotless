@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -27,14 +28,13 @@ namespace ObjectSpike
         public LessDocument ToDocument(PegNode node)
         {
             var document = new LessDocument();
-
             // assumption: Root will ALWAYS contain only 'primary' nodes.
-            foreach(var childNode in node.child_.AsEnumerable())
+            foreach(var childNode in node.AsEnumerable())
             {
                 switch (childNode.id_.ToEnLess())
                 {
-                    case EnLess.ruleset:
-                        var ruleset = ToRule(childNode.child_);
+                    case EnLess.standard_ruleset:
+                        var ruleset = ToRule(childNode);
                         document.Rules.AddRange(ruleset);
                         break;
                     default:
@@ -46,6 +46,11 @@ namespace ObjectSpike
             return document;
         }
 
+        private string PrintTree(PegNode root)
+        {
+            return PrintTree(root, 0);
+        }
+
         private IEnumerable<LessRule> ToRule(PegNode node)
         {
             var rule = new LessRule();
@@ -54,29 +59,18 @@ namespace ObjectSpike
             {
                 switch (childNode.id_.ToEnLess())
                 {
-                    case EnLess.selectors:
-                        selectors.AddRange(childNode.AsEnumerable().Select(x => ToSelectors(x)));
+                    case EnLess.selector:
+                        selectors.Add(ToSelectors(childNode));
                         break;
 
-                    case EnLess.primary:
-                        foreach(var cursor in childNode.AsEnumerable())
-                        {
-                            switch(cursor.id_.ToEnLess())
-                            {
-                                case EnLess.ruleset:
-                                    var ruleset = ToRule(cursor.child_);
-                                    rule.Rules.AddRange(ruleset);
-                                    break;
-                                case EnLess.declaration:
-                                    var prop = ToProperty(cursor.child_);
-                                    rule.Properties.Add(prop);
-                                    break;
-                                default:
-                                    System.Console.WriteLine(cursor.id_.ToEnLess());
-                                    break;
-
-                            }
-                        }
+                    case EnLess.standard_ruleset:
+                        var ruleset = ToRule(childNode);
+                        rule.Rules.AddRange(ruleset);
+                        break;
+                    
+                    case EnLess.standard_declaration:
+                        var prop = ToProperty(childNode);
+                        rule.Properties.Add(prop);
                         break;
 
                     default:
@@ -112,7 +106,7 @@ namespace ObjectSpike
 
         private LessSelector ToSelectors(PegNode node)
         {
-            var selector = new LessSelector {Name = node.GetAsString(Src).Trim()};
+            var selector = new LessSelector { Name = node.GetAsString(Src).Trim() };
             return selector;
         }
         
