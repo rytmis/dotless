@@ -54,6 +54,7 @@
     <Compile Include="LessProperty.cs" />
     <Compile Include="LessRule.cs" />
     <Compile Include="LessSelector.cs" />
+    <Compile Include="LessVariable.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="NodeEnumerator.cs" />
     <Compile Include="Operations\AutoFixIEOperation.cs" />

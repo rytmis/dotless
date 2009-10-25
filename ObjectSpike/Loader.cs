@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using nLess;
 using Peg.Base;
@@ -60,7 +58,8 @@ namespace ObjectSpike
                 switch (childNode.id_.ToEnLess())
                 {
                     case EnLess.selector:
-                        selectors.Add(ToSelectors(childNode));
+                        var selector = ToSelectors(childNode);
+                        selectors.Add(selector);
                         break;
 
                     case EnLess.standard_ruleset:
@@ -69,8 +68,16 @@ namespace ObjectSpike
                         break;
                     
                     case EnLess.standard_declaration:
-                        var prop = ToProperty(childNode);
-                        rule.Properties.Add(prop);
+                        if(childNode.child_.id_.ToEnLess() == EnLess.variable)
+                        {
+                            var variable = ToVariable(childNode);
+                            
+                        }
+                        else
+                        {
+                            var prop = ToProperty(childNode);
+                            rule.Properties.Add(prop);                            
+                        }
                         break;
 
                     default:
@@ -109,6 +116,14 @@ namespace ObjectSpike
             var selector = new LessSelector { Name = node.GetAsString(Src).Trim() };
             return selector;
         }
-        
+
+        private LessVariable ToVariable(PegNode node)
+        {
+            return new LessVariable
+               {
+                   Name = node.child_.GetAsString(Src).Substring(1),
+                   Value = node.child_.next_.GetAsString(Src)
+               };
+        }
     }
 }

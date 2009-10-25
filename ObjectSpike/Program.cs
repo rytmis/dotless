@@ -16,7 +16,7 @@ namespace ObjectSpike
                                                                   };
         static void Main(string[] args)
         {
-            var less = File.ReadAllText(@"..\..\..\nLess.Test\Spec\less\rulesets.less");
+            var less = File.ReadAllText(@"..\..\..\nLess.Test\Spec\less\accessors.less");
             var parser = new nLess.nLess(less, Console.Out);
             parser.Parse();
             var root = parser.GetRoot();
